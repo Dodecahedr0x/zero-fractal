@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 sp1-zkvm = "4.0.1"
+fractal = { path = "../crates/fractal" }

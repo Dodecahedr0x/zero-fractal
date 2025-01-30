@@ -1,5 +1,3 @@
-use image::{ImageBuffer, Rgb};
-
 fn mandelbrot(c: (f64, f64), max_iter: u32) -> u32 {
     let mut z = (0.0, 0.0);
     let mut n = 0;
@@ -46,26 +44,42 @@ fn get_color(iter: u32, max_iter: u32) -> [u8; 3] {
     }
 }
 
-fn main() {
-    let imgx = 18;
-    let imgy = 18;
+pub fn create_fractal_pixels(size: u64, x: u64, y: u64, zoom: u64) -> Vec<[u8; 3]> {
+    let imgx = size as usize;
+    let imgy = size as usize;
+
     let max_iter = 255;
     let min_x = -2.0;
     let max_x = 1.0;
     let min_y = -1.5;
     let max_y = 1.5;
+    let min_zoom: f64 = 0.00001;
+    let max_zoom: f64 = 1.0;
 
-    let mut imgbuf = ImageBuffer::new(imgx, imgy);
+    let raw_center_x: u64 = x;
+    let raw_center_y: u64 = y;
+    let raw_zoom: u64 = zoom;
 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let cx = x as f64 / imgx as f64 * (max_x - min_x) + min_x;
-        let cy = y as f64 / imgy as f64 * (max_y - min_y) + min_y;
-        let c = (cx, cy);
+    let center_x = (raw_center_x as f64) / 2.0_f64.powi(64) * (max_x - min_x) + min_x;
+    let center_y = (raw_center_y as f64) / 2.0_f64.powi(64) * (max_y - min_y) + min_y;
+    let zoom = 10_f64.powf(
+        (raw_zoom as f64) / 2_f64.powi(64) * (max_zoom.log10() - min_zoom.log10())
+            + min_zoom.log10(),
+    );
 
-        let m = mandelbrot(c, max_iter);
+    let mut img = Vec::with_capacity(imgx * imgy);
 
-        *pixel = Rgb(get_color(m, max_iter));
+    for y in 0..imgy {
+        for x in 0..imgx {
+            let cx = (x as f64 / imgx as f64 - 0.5) * (max_x - min_x) * zoom + center_x;
+            let cy = (y as f64 / imgy as f64 - 0.5) * (max_y - min_y) * zoom + center_y;
+            let c = (cx, cy);
+
+            let m = mandelbrot(c, max_iter);
+
+            img.push(get_color(m, max_iter));
+        }
     }
 
-    imgbuf.save("../../target/mandelbrot.png").unwrap();
+    img
 }

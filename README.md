@@ -17,3 +17,10 @@ Thanks to ZK proofs, we are able to run the compute-intensive task of generating
 2. `programs/sketch` is the actual verifiable program used to generate the proof.
 3. `programs/zero-fractal` is the on-chain program that will mint NFTs and update them by interacting with the on-chain verifier.
 4. `app` contains a simple front-end to interact with the program.
+
+## Usage
+
+1. `cd sp1/program`
+2. `cargo prove build`
+3. `cd ../script`
+4. `SP1_ELF_sketch=../../target/elf-compilation/riscv32im-succinct-zkvm-elf/release/sketch cargo run --release -- --prove` (use `--size` to adjust the resource usage)

@@ -88,6 +88,7 @@ fn main() {
             .groth16()
             .run()
             .expect("failed to generate proof");
+        proof.save("./proof.bin").expect("failed to save proof");
 
         println!("Successfully generated proof!");
 
